@@ -20,6 +20,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        User::create(
+            [
+                'name' => 'admin',
+                'email' => 'admin@jf.com',
+                'password' => bcrypt('password'),
+                'role' => 'admin',
+            ]
+        );
 
         $faker = app(Generator::class);
 
