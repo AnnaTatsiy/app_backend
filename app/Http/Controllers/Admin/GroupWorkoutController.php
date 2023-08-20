@@ -134,8 +134,8 @@ class GroupWorkoutController extends Controller
 
     // получить все записи (вывод всех групповых тренировок) постранично
     public function groupWorkouts(): JsonResponse{
-        $this->preparationEdit();
-        $this->preparationAdd();
+        //$this->preparationEdit();
+        //$this->preparationAdd();
         return response()->json(GroupWorkout::with( 'schedule.gym','schedule.workout_type', 'schedule.coach','schedule.day')->orderByDesc('event')->paginate(12));
     }
 

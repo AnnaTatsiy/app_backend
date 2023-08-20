@@ -22,6 +22,9 @@ return new class extends Migration
             $table->string("mail");
             $table->string("number");
 
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+
             $table->string('registration',255);
 
             $table->timestamps();

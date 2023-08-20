@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coach;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -34,13 +35,28 @@ class CoachController extends Controller {
 
     //сохранение тренера в БД
     public function saveInDB(Coach $coach, Request $request): Coach{
+
+        $name = $request->input('name');
+        $patronymic = $request->input('patronymic');
+        $email = $request->input('mail');
+
+        $user = User::create(
+            [
+                'name' => $name . " " . $patronymic,
+                'email' => $email,
+                'password' => bcrypt('password'),
+                'role' => 'coach',
+            ]
+        );
+
         $coach->surname = $request->input('surname');
-        $coach->name = $request->input('name');
-        $coach->patronymic = $request->input('patronymic');
+        $coach->name = $name;
+        $coach->patronymic = $patronymic;
         $coach->passport = $request->input('passport');
         $coach->birth = $request->input('birth');
-        $coach->mail = $request->input('mail');
+        $coach->mail = $email;
         $coach->number = $request->input('number');
+        $coach->user_id = $user->id;
         $coach->registration = $request->input('registration');
 
         $coach->save();

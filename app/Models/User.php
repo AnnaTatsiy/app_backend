@@ -22,7 +22,15 @@ class User extends Authenticatable
     ];
 
     protected $hidden = [
-        'password',
+        'password'
     ];
+
+    public function customer():HasMany {
+        return $this->hasMany(Customer::class);
+    }
+
+    public function coach():HasMany {
+        return $this->hasMany(Coach::class);
+    }
 
 }

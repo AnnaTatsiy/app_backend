@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Coach extends Model
@@ -19,6 +20,7 @@ class Coach extends Model
         'birth',
         'mail',
         'number',
+        'user_id',
         'registration'
     ];
 
@@ -33,5 +35,9 @@ class Coach extends Model
 
     public function limited_price_list():HasMany {
         return $this->hasMany(LimitedPriceList::class);
+    }
+
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class);
     }
 }
