@@ -106,6 +106,19 @@ Route::middleware('auth:sanctum')->group(function (){
 
         //получает информацию о текущем абонементе (безлимит)
         Route::get('customer/about-subscription', [\App\Http\Controllers\Customer\CustomerController::class, 'aboutSubscription']);
+
+        //получает информацию о текущем абонементе (тренировки с тренером)
+        Route::get('customer/about-subscription-with-coach', [\App\Http\Controllers\Customer\CustomerController::class, 'aboutSubscriptionWithCoach']);
+
+        // получить все доступные тренировки для записи клиента
+        Route::get('customer/get-available-workouts', [\App\Http\Controllers\Customer\CustomerController::class, 'getAvailableWorkouts']);
+
+        // получить все актуальные записи клиента (на которые клиент может прийти)
+        Route::get('customer/current-sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'currentSignUp']);
+
+        // запись клиента на тренировки
+        Route::post('customer/sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'signUp']);
+
     });
 
 });
