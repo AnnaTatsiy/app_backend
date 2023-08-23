@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 class GroupWorkoutController extends Controller
 {
     //добавдение групповых тренировок происходит из расписания занятий
-    public function preparationAdd() : void{
+    public static function preparationAdd() : void{
 
         //признак первого запуска
         $first = (GroupWorkout::all()->count() == 0);
@@ -31,21 +31,21 @@ class GroupWorkoutController extends Controller
 
             // первый запуск
             case $first:
-                    $count = 14;
+                    $count = 15;
                 break;
 
             // если дата текущая больше даты последней тренировки
             case ($now > $max_date):
-                    $count = 13 + Utils::subtractingDates($max_date, $now);
+                    $count = 14 + Utils::subtractingDates($max_date, $now);
                 break;
 
             case ($now == $max_date):
-                $count = 13;
+                $count = 14;
                 break;
 
             // если дата текущая меньше даты последней тренировки
             case ($now <  $max_date):
-                $count = 10 - Utils::subtractingDates($now, $max_date);
+                $count = 14 - Utils::subtractingDates($now, $max_date);
                 break;
         }
 
@@ -97,7 +97,7 @@ class GroupWorkoutController extends Controller
 
     // если на тренировку записались менее 5 человек - тренировка отменяется
     // отменяем тренировки
-    public function preparationEdit() : void {
+    public static function preparationEdit() : void {
         $workouts = GroupWorkout::all()->where('cancelled', 0)->where('event','<=', date("Y-m-d"));
 
         if(count($workouts) != 0) {
@@ -134,8 +134,6 @@ class GroupWorkoutController extends Controller
 
     // получить все записи (вывод всех групповых тренировок) постранично
     public function groupWorkouts(): JsonResponse{
-        //$this->preparationEdit();
-        //$this->preparationAdd();
         return response()->json(GroupWorkout::with( 'schedule.gym','schedule.workout_type', 'schedule.coach','schedule.day')->orderByDesc('event')->paginate(12));
     }
 

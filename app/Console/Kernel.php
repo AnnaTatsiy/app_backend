@@ -2,22 +2,24 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\Admin\GroupWorkoutController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     */
+
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->call(function (){
+            GroupWorkoutController::preparationEdit();
+        })->timezone('Europe/Moscow')->dailyAt('15:00'); // ежедневно в 15:00
+
+        $schedule->call(function (){
+            GroupWorkoutController:: preparationAdd();
+        })->timezone('Europe/Moscow')->dailyAt('15:00'); // ежедневно в 15:00
     }
 
-    /**
-     * Register the commands for the application.
-     */
     protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');

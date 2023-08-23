@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Http\Controllers\Admin\GroupWorkoutController;
 use App\Http\Controllers\Controller;
+use App\Http\Helpers\Utils;
 use App\Models\Customer;
 use App\Models\GroupWorkout;
 use App\Models\LimitedSubscription;
@@ -38,7 +40,6 @@ class CustomerController extends Controller
     //получает информацию о текущем абонементе (тренировки с тренером)
     public function aboutSubscriptionWithCoach(): JsonResponse
     {
-
         $customer = $this->getCustomer();
 
         $subscription = LimitedSubscription::with('limited_price_list.coach')
@@ -53,6 +54,28 @@ class CustomerController extends Controller
     public function getAvailableWorkouts(): JsonResponse
     {
         $customer = $this->getCustomer();
+
+        //проверяем клиента
+        //получаем абонемент клиента
+        $subscription = UnlimitedSubscription::with('unlimited_price_list.subscription_type')
+            ->where('customer_id', $customer->id)
+            ->orderByDesc('open')
+            ->first();
+
+        //находим дату окончания дейсвия абонемента
+        $date = Utils::incMonths($subscription->open, $subscription->unlimited_price_list->validity_period);
+
+        // не может записаться на групповые тренировки если:
+        //1. нет действующего абонемента
+        if ($date <= date("Y-m-d")){
+            return  response()->json([ 'message' => "У вашего абонемента закончился срок действия!"] );
+        }
+
+        //2. в тариф абонемента не входят групповые тренеровки
+        if($subscription->unlimited_price_list->subscription_type->group == 0){
+            return  response()->json([ 'message' => "У в ваш тариф не входят групповые тренировки!"] );
+        }
+
         $availableWorkouts_temp = array();
         $availableWorkouts = array();
 
