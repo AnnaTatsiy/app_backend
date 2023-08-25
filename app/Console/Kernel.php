@@ -13,11 +13,11 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function (){
             GroupWorkoutController::preparationEdit();
-        })->timezone('Europe/Moscow')->dailyAt('15:00'); // ежедневно в 15:00
+        })->timezone('Europe/Moscow')->everyMinute();//->dailyAt('15:00'); // ежедневно в 15:00
 
         $schedule->call(function (){
             GroupWorkoutController:: preparationAdd();
-        })->timezone('Europe/Moscow')->dailyAt('15:00'); // ежедневно в 15:00
+        })->timezone('Europe/Moscow')->everyMinute();//->dailyAt('15:00'); // ежедневно в 15:00
     }
 
     protected function commands(): void

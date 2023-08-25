@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Customer\CustomerController;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -24,8 +25,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-      //  Gate::define('view-admin-part', function (User $user){
-       //     return $user->role_id === 2;
-      //  });
+        Gate::define('checking-the-subscription', [CustomerController::class, 'checkingCustomerForGate']);
     }
 }

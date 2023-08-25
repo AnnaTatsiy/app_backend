@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Customer;
 
-use App\Http\Controllers\Admin\GroupWorkoutController;
 use App\Http\Controllers\Controller;
 use App\Http\Helpers\Utils;
 use App\Models\Customer;
@@ -11,9 +10,9 @@ use App\Models\LimitedSubscription;
 use App\Models\SignUpGroupWorkout;
 use App\Models\UnlimitedSubscription;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CustomerController extends Controller
 {
@@ -50,10 +49,11 @@ class CustomerController extends Controller
         return response()->json($subscription);
     }
 
-    // получить все доступные тренировки для записи клиента
-    public function getAvailableWorkouts(): JsonResponse
-    {
+    //проверяем клиента
+    private function checkingCustomer(): int{
         $customer = $this->getCustomer();
+
+        $code = 0;
 
         //проверяем клиента
         //получаем абонемент клиента
@@ -68,13 +68,38 @@ class CustomerController extends Controller
         // не может записаться на групповые тренировки если:
         //1. нет действующего абонемента
         if ($date <= date("Y-m-d")){
-            return  response()->json([ 'message' => "У вашего абонемента закончился срок действия!"] );
+            $code = 1;
         }
 
         //2. в тариф абонемента не входят групповые тренеровки
         if($subscription->unlimited_price_list->subscription_type->group == 0){
-            return  response()->json([ 'message' => "У в ваш тариф не входят групповые тренировки!"] );
+            $code = 2;
         }
+
+        return $code;
+    }
+
+    public function checkingCustomerForGate(): bool{
+        $code = $this->checkingCustomer();
+        return ($code === 1 || $code === 2);
+    }
+
+    public function checkingCustomerShowError(): String{
+        return match ($this->checkingCustomer()) {
+            1 => "У вашего абонемента закончился срок действия!",
+            2 => "В ваш тариф не входят групповые тренировки!",
+            default => "ok",
+        };
+    }
+
+    // получить все доступные тренировки для записи клиента
+    public function getAvailableWorkouts(): JsonResponse
+    {
+        if(Gate::allows('checking-the-subscription')) {
+           return response()->json($this->checkingCustomerShowError());
+        }
+
+        $customer = $this->getCustomer();
 
         $availableWorkouts_temp = array();
         $availableWorkouts = array();
@@ -168,5 +193,10 @@ class CustomerController extends Controller
         $sign->save();
 
         return response()->json($sign);
+    }
+
+    //отмена записи на групповую тренировку
+    public function deleteSignUpGroupWorkout(Request $request): JsonResponse{
+        $id = $request->input('id'); // id тренировки
     }
 }
