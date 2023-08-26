@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\user\Password;
 use App\Models\Coach;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class CoachController extends Controller {
 
@@ -22,47 +25,69 @@ class CoachController extends Controller {
 
     //добавление тренера
     public function addCoach(Request $request):JsonResponse{
-        return response()->json($this->saveInDB(new Coach(), $request));
+
+        // получаю поля из запроса
+        $surname =  $request->input('surname');
+        $name = $request->input('name');
+        $patronymic = $request->input('patronymic');
+        $email = $request->input('mail');
+        $passport = $request->input('passport');
+        $birth = $request->input('birth');
+        $number = $request->input('number');
+        $registration = $request->input('registration');
+
+        // генерирую пароль
+        $password = Str::random(8);
+
+        //отсылаю пароль на почту
+        Mail::to($email)->send(new Password($surname, $name ,$patronymic, $password, $birth, $email, $passport ,$number, $registration, "добро пожаловать в нашу команду!"));
+
+        // создаю личный кабинет
+        $user = User::create(
+            [
+                'name' => $name . " " . $patronymic,
+                'email' => $email,
+                'password' => bcrypt($password),
+                'role' => 'coach',
+            ]
+        );
+
+        //сохраняю в БД
+        $coach = new Coach();
+
+        $coach->surname = $surname;
+        $coach->name = $name;
+        $coach->patronymic = $patronymic;
+        $coach->passport = $passport;
+        $coach->birth = $birth;
+        $coach->mail = $email;
+        $coach->number = $number;
+        $coach->user_id = $user->id;
+        $coach->registration = $registration;
+
+        $coach->save();
+
+        // создаю прйс лист на индивидуальные тренировки
+        LimitedPriceListController::addLimitedPriceList($coach->id);
+
+        return response()->json($coach);
     }
 
     //редактирование тренера
     public function editCoach(Request $request):JsonResponse{
         $coach = Coach::all()->where('id', $request->input('id'))->first();
 
-        $response = ($coach != null) ? $this->saveInDB($coach, $request) : 0;
-        return response()->json($response);
-    }
-
-    //сохранение тренера в БД
-    public function saveInDB(Coach $coach, Request $request): Coach{
-
-        $name = $request->input('name');
-        $patronymic = $request->input('patronymic');
-        $email = $request->input('mail');
-
-        $user = User::create(
-            [
-                'name' => $name . " " . $patronymic,
-                'email' => $email,
-                'password' => bcrypt('password'),
-                'role' => 'coach',
-            ]
-        );
-
         $coach->surname = $request->input('surname');
-        $coach->name = $name;
-        $coach->patronymic = $patronymic;
+        $coach->name =  $request->input('name');
+        $coach->patronymic = $request->input('patronymic');
         $coach->passport = $request->input('passport');
         $coach->birth = $request->input('birth');
-        $coach->mail = $email;
-        $coach->number = $request->input('number');
-        $coach->user_id = $user->id;
+        $coach->mail = $request->input('mail');
+        $coach->number =$request->input('number');
         $coach->registration = $request->input('registration');
 
         $coach->save();
 
-        LimitedPriceListController::addLimitedPriceList($coach->id);
-
-        return $coach;
+        return response()->json($coach);
     }
 }

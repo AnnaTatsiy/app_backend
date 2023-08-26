@@ -119,6 +119,9 @@ Route::middleware('auth:sanctum')->group(function (){
         // запись клиента на тренировки
         Route::post('customer/sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'signUp']);
 
+        //отмена записи на групповую тренировку
+        Route::post('customer/delete-sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'deleteSignUpGroupWorkout']);
+
     });
 
 });

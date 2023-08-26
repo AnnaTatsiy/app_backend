@@ -11,10 +11,8 @@ class SignUpGroupWorkout extends Model
     use HasFactory;
 
     protected $fillable = [
-
         'customer_id',
         'group_workout_id'
-
     ];
 
     // сторона "много" отношение "1:М", отношение "принадлежит"

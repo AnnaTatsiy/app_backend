@@ -176,14 +176,17 @@ class CustomerController extends Controller
             ->where('customer_id', $customer->id)
             ->pluck('group_workout_id');
 
-        // находим колво тренировок на которые записан клиент
+        // находим кол-во тренировок на которые записан клиент
         $workouts = GroupWorkout::all()
             ->whereIn('id', $workouts_id)
             ->where('event', '=', $workout->event);
 
+        foreach ($workouts as $workout){
+            $arr[] = $workout;}
+
         // если уже записан на 2 трен возвращаем их для возможности отмены
         if ($workouts->count() > 1) {
-            return response()->json($workouts);
+            return response()->json($arr);
         }
 
         $sign = new SignUpGroupWorkout();
@@ -198,5 +201,15 @@ class CustomerController extends Controller
     //отмена записи на групповую тренировку
     public function deleteSignUpGroupWorkout(Request $request): JsonResponse{
         $id = $request->input('id'); // id тренировки
+        $customer = $this->getCustomer();
+
+        //нашли запись на тренировку которую будем удалять
+        $sign = SignUpGroupWorkout::all()
+            ->where('customer_id', $customer->id)
+            ->where('group_workout_id', $id)->first();
+
+        $sign->delete();
+
+        return response()->json($sign);
     }
 }
