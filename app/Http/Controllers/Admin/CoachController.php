@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\user\Password;
 use App\Models\Coach;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,6 +77,7 @@ class CoachController extends Controller {
     //редактирование тренера
     public function editCoach(Request $request):JsonResponse{
         $coach = Coach::all()->where('id', $request->input('id'))->first();
+        $user = User::all()->where('id', $coach->user_id)->first();
 
         $coach->surname = $request->input('surname');
         $coach->name =  $request->input('name');
@@ -83,11 +85,39 @@ class CoachController extends Controller {
         $coach->passport = $request->input('passport');
         $coach->birth = $request->input('birth');
         $coach->mail = $request->input('mail');
+        $user->email = $request->input('mail');
         $coach->number =$request->input('number');
         $coach->registration = $request->input('registration');
 
         $coach->save();
+        $user->save();
 
         return response()->json($coach);
+    }
+
+    //проверка данных на уникальность
+
+    //проверка паспорта
+    public function checkingUniquePassport($value): JsonResponse
+    {
+        return response()->json([
+            'result' => count(Coach::all()->where('passport', $value))
+        ]);
+    }
+
+    //проверка номера телефона
+    public function checkingUniqueNumber($value): JsonResponse
+    {
+        return response()->json([
+            'result' => count(Coach::all()->where('number', $value))
+        ]);
+    }
+
+    //проверка email
+    public function checkingUniqueMail($value): JsonResponse
+    {
+        return response()->json([
+            'result' => count(Coach::all()->where('mail', $value))
+        ]);
     }
 }

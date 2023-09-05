@@ -4,15 +4,23 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Helpers\Utils;
+use App\Http\Requests\ImageRequest;
 use App\Models\Customer;
 use App\Models\GroupWorkout;
+use App\Models\Image;
 use App\Models\LimitedSubscription;
 use App\Models\SignUpGroupWorkout;
 use App\Models\UnlimitedSubscription;
 use App\Models\User;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
@@ -50,7 +58,8 @@ class CustomerController extends Controller
     }
 
     //проверяем клиента
-    private function checkingCustomer(): int{
+    private function checkingCustomer(): int
+    {
         $customer = $this->getCustomer();
 
         $code = 0;
@@ -67,24 +76,26 @@ class CustomerController extends Controller
 
         // не может записаться на групповые тренировки если:
         //1. нет действующего абонемента
-        if ($date <= date("Y-m-d")){
+        if ($date <= date("Y-m-d")) {
             $code = 1;
         }
 
         //2. в тариф абонемента не входят групповые тренеровки
-        if($subscription->unlimited_price_list->subscription_type->group == 0){
+        if ($subscription->unlimited_price_list->subscription_type->group == 0) {
             $code = 2;
         }
 
         return $code;
     }
 
-    public function checkingCustomerForGate(): bool{
+    public function checkingCustomerForGate(): bool
+    {
         $code = $this->checkingCustomer();
         return ($code === 1 || $code === 2);
     }
 
-    public function checkingCustomerShowError(): String{
+    public function checkingCustomerShowError(): string
+    {
         return match ($this->checkingCustomer()) {
             1 => "У вашего абонемента закончился срок действия!",
             2 => "В ваш тариф не входят групповые тренировки!",
@@ -95,8 +106,8 @@ class CustomerController extends Controller
     // получить все доступные тренировки для записи клиента
     public function getAvailableWorkouts(): JsonResponse
     {
-        if(Gate::allows('checking-the-subscription')) {
-           return response()->json($this->checkingCustomerShowError());
+        if (Gate::allows('checking-the-subscription')) {
+            return response()->json($this->checkingCustomerShowError());
         }
 
         $customer = $this->getCustomer();
@@ -181,8 +192,9 @@ class CustomerController extends Controller
             ->whereIn('id', $workouts_id)
             ->where('event', '=', $workout->event);
 
-        foreach ($workouts as $workout){
-            $arr[] = $workout;}
+        foreach ($workouts as $workout) {
+            $arr[] = $workout;
+        }
 
         // если уже записан на 2 трен возвращаем их для возможности отмены
         if ($workouts->count() > 1) {
@@ -199,7 +211,8 @@ class CustomerController extends Controller
     }
 
     //отмена записи на групповую тренировку
-    public function deleteSignUpGroupWorkout(Request $request): JsonResponse{
+    public function deleteSignUpGroupWorkout(Request $request): JsonResponse
+    {
         $id = $request->input('id'); // id тренировки
         $customer = $this->getCustomer();
 
@@ -211,5 +224,61 @@ class CustomerController extends Controller
         $sign->delete();
 
         return response()->json($sign);
+    }
+
+    // получить изображение
+    public function index()
+    {
+        $id = auth()->user()->image_id;
+        $image = Image::all()->where('id', $id)->first();
+        return response()->json(["status" => "success", "data" => $image]);
+    }
+
+    //получить изображение от клиента
+    public function upload(Request $request): JsonResponse
+    {
+        $response = [];
+
+        $fileArray = array('image' => $request->only('image'));
+
+        $validator = Validator::make($fileArray,
+            [
+                'image' => 'required',
+                'image.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]
+        );
+
+        $errors = array(
+            'image' => 'Изображение не было выбрано',
+            'image.max' => "Изображение слишком большое",
+            'image.mimes' => "Требуется расширение файла jpg, png, jpeg, gif, svg",
+            'image.image' => "Требуется расширение файла jpg, png, jpeg, gif, svg"
+        );
+
+        if ($validator->fails()) {
+            return response()->json(["status" => "failed", "message" => "Ошибка валидации", "error" => $errors["{$validator->errors()->keys()[0]}"]]);
+        }
+
+        if ($request->has('image')) {
+            $image = $request->file('image');
+            $filename = Str::random(32) . "." . $image->getClientOriginalExtension();
+            $image->move('users/', $filename);
+
+            $new_image = new Image();
+            $new_image->path = $filename;
+            $new_image->save();
+
+            $user = auth()->user();
+            $user->image_id = $new_image->id;
+            $user->save();
+
+
+            $response["status"] = "success";
+            $response["message"] = "Изображение загруженно!";
+        } else {
+            $response["status"] = "failed";
+            $response["message"] = "Ошибка сервера: изображение не загруженно.";
+        }
+        return response()->json($response);
     }
 }

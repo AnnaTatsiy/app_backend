@@ -28,6 +28,7 @@ class CoachFactory extends Factory
                 'name' => $name . " " . $patronymic,
                 'email' => $email,
                 'password' => bcrypt('password'),
+                'image_id' => 1,
                 'role' => 'coach',
             ]
         );

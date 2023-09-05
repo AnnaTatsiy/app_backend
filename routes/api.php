@@ -99,32 +99,64 @@ Route::middleware('auth:sanctum')->group(function (){
 
         // Сторона Администратора: купленные тренировки данного клиента.
         Route::post('limited-subscriptions/select-limited-subscriptions-by-customer', [LimitedSubscriptionController::class, 'selectLimitedSubscriptionsByCustomer']);
+
+        //валидация на стороне сервера
+        //проверка данных на уникальность
+
+        //проверка паспорта
+        Route::get('customers/checking-unique-passport/{value}', [CustomerController::class, 'checkingUniquePassport']);
+        //проверка номера телефона
+        Route::get('customers/checking-unique-number/{value}', [CustomerController::class, 'checkingUniqueNumber']);
+        //проверка email
+        Route::get('customers/checking-unique-mail/{value}', [CustomerController::class, 'checkingUniqueMail']);
+
+        //проверка паспорта
+        Route::get('coaches/checking-unique-passport/{value}', [CoachController::class, 'checkingUniquePassport']);
+        //проверка номера телефона
+        Route::get('coaches/checking-unique-number/{value}', [CoachController::class, 'checkingUniqueNumber']);
+        //проверка email
+        Route::get('coaches/checking-unique-mail/{value}', [CoachController::class, 'checkingUniqueMail']);
+
+    });
+
+    // Сторона Клиента и Тренера
+    Route::middleware(["restrictRole:coach,customer"])->group(function (){
+
+        // получить изображение
+        Route::get('/get-image', [\App\Http\Controllers\Customer\CustomerController::class, 'index']);
+        //загрузить файл
+        Route::post('/upload', [\App\Http\Controllers\Customer\CustomerController::class, 'upload']);
     });
 
     // Сторона Клиента
-    Route::middleware(['restrictRole:customer'])->group(function (){
+    Route::middleware(['restrictRole:customer'])->prefix('customer')->group(function (){
 
         //получает информацию о текущем абонементе (безлимит)
-        Route::get('customer/about-subscription', [\App\Http\Controllers\Customer\CustomerController::class, 'aboutSubscription']);
+        Route::get('/about-subscription', [\App\Http\Controllers\Customer\CustomerController::class, 'aboutSubscription']);
 
         //получает информацию о текущем абонементе (тренировки с тренером)
-        Route::get('customer/about-subscription-with-coach', [\App\Http\Controllers\Customer\CustomerController::class, 'aboutSubscriptionWithCoach']);
+        Route::get('/about-subscription-with-coach', [\App\Http\Controllers\Customer\CustomerController::class, 'aboutSubscriptionWithCoach']);
 
         // получить все доступные тренировки для записи клиента
-        Route::get('customer/get-available-workouts', [\App\Http\Controllers\Customer\CustomerController::class, 'getAvailableWorkouts']);
+        Route::get('/get-available-workouts', [\App\Http\Controllers\Customer\CustomerController::class, 'getAvailableWorkouts']);
 
         // получить все актуальные записи клиента (на которые клиент может прийти)
-        Route::get('customer/current-sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'currentSignUp']);
+        Route::get('/current-sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'currentSignUp']);
 
         // запись клиента на тренировки
-        Route::post('customer/sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'signUp']);
+        Route::post('/sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'signUp']);
 
         //отмена записи на групповую тренировку
-        Route::post('customer/delete-sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'deleteSignUpGroupWorkout']);
+        Route::post('/delete-sign-up', [\App\Http\Controllers\Customer\CustomerController::class, 'deleteSignUpGroupWorkout']);
 
     });
 
+    // Сторона Тренера
+    Route::middleware(['restrictRole:coach'])->prefix('coach')->group(function (){
+    });
+
 });
+
 
 
 

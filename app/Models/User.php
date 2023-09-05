@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,10 +19,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'image_id',
         'role'
     ];
 
     protected $hidden = [
+        'image_id',
         'password'
     ];
 
@@ -31,6 +34,10 @@ class User extends Authenticatable
 
     public function coach():HasMany {
         return $this->hasMany(Coach::class);
+    }
+
+    public function image(): BelongsTo {
+        return $this->belongsTo(Image::class);
     }
 
 }

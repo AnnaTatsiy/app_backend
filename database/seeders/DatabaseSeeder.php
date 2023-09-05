@@ -6,6 +6,7 @@ use App\Http\Helpers\Utils;
 use App\Models\coach;
 use App\Models\Customer;
 use App\Models\GroupWorkout;
+use App\Models\Image;
 use App\Models\Schedule;
 use App\Models\UnlimitedPriceList;
 use App\Models\User;
@@ -20,12 +21,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        Image::create(
+            [
+                'path' => 'default.png'
+            ]
+        );
+
         // создание единственного админа
         User::create(
             [
                 'name' => 'admin',
                 'email' => 'admin@jf.com',
                 'password' => bcrypt('password'),
+                'image_id' => 1,
                 'role' => 'admin',
             ]
         );

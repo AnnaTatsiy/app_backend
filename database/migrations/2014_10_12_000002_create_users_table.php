@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+
+            $table->unsignedInteger('image_id');
+            $table->foreign('image_id')->references('id')->on('images');
+
             $table->enum('role', ['admin', 'customer', 'coach'])->default('customer');
             $table->timestamps();
         });

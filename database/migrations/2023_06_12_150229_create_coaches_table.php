@@ -19,8 +19,8 @@ return new class extends Migration
 
             $table->date("birth");//Дата рождения
 
-            $table->string("mail");
-            $table->string("number");
+            $table->string("mail")->unique();
+            $table->string("number")->unique();
 
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
