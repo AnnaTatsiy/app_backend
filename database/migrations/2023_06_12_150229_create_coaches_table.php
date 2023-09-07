@@ -27,6 +27,9 @@ return new class extends Migration
 
             $table->string('registration',255);
 
+            //признак продает ли тренер абонементы на персональные тренеровки
+            $table->boolean('sale');
+
             $table->timestamps();
         });
     }

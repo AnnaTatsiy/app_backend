@@ -244,19 +244,18 @@ class CustomerController extends Controller
         $validator = Validator::make($fileArray,
             [
                 'image' => 'required',
-                'image.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'image.*' => 'bail|required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ],
+            [
+                'image' => 'Изображение не было выбрано',
+                'image.max' => "Изображение слишком большое",
+                'image.mimes' => "Требуется расширение файла jpg, png, jpeg, gif, svg",
+                'image.image' => "Требуется изображение c расширением jpg, png, jpeg, gif, svg"
             ]
         );
 
-        $errors = array(
-            'image' => 'Изображение не было выбрано',
-            'image.max' => "Изображение слишком большое",
-            'image.mimes' => "Требуется расширение файла jpg, png, jpeg, gif, svg",
-            'image.image' => "Требуется расширение файла jpg, png, jpeg, gif, svg"
-        );
-
         if ($validator->fails()) {
-            return response()->json(["status" => "failed", "message" => "Ошибка валидации", "error" => $errors["{$validator->errors()->keys()[0]}"]]);
+            return response()->json(["status" => "failed", "message" => "Ошибка валидации", "errors" => $validator->errors()->messages()[$validator->errors()->keys()[0]][0]]);
         }
 
         if ($request->has('image')) {

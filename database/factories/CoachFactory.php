@@ -44,7 +44,7 @@ class CoachFactory extends Factory
             'number' => $faker->phoneNumber,
             'user_id' => $user->id,
             'registration' => $faker->address,
-
+            'sale' => true
         ];
     }
 }

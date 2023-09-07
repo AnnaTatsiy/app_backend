@@ -21,7 +21,8 @@ class Coach extends Model
         'mail',
         'number',
         'user_id',
-        'registration'
+        'registration',
+        'sale'
     ];
 
     // сторона "один" отношения "1:М" - отношение "имеет"

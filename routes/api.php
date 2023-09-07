@@ -153,6 +153,18 @@ Route::middleware('auth:sanctum')->group(function (){
 
     // Сторона Тренера
     Route::middleware(['restrictRole:coach'])->prefix('coach')->group(function (){
+
+        //может изменить цену на абонемент (упрощение модели)
+        Route::post('/edit-limited-price', [\App\Http\Controllers\Coach\CoachController::class, 'editLimitedPrice']);
+
+        //получить признак доступна ли продажа абонементов
+        Route::get('/get-sale', [\App\Http\Controllers\Coach\CoachController::class, 'getSale']);
+
+        // тренер может запретить продажу абонементов
+        Route::get('/change-sale', [\App\Http\Controllers\Coach\CoachController::class, 'changeSale']);
+
+        //получить тренера из авторизированного пользователя
+        Route::get('/get-coach', [\App\Http\Controllers\Coach\CoachController::class, 'getCoachJSON']);
     });
 
 });
