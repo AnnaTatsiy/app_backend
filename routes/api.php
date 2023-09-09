@@ -85,6 +85,8 @@ Route::middleware('auth:sanctum')->group(function (){
         //получить все тренировки пройденные через фильтр
         Route::get('sign-up-personal-workouts/filtered/', [SignUpPersonalWorkoutController::class, 'signUpPersonalWorkoutsFiltered']);
 
+        Route::get('sign-up-personal-workouts/get-sign-up-personal-workouts-by-coach/{id}/{page}', [SignUpPersonalWorkoutController::class, 'getSignUpPersonalWorkoutsByCoach']);
+
         // получить все записи (вывести прайс лист на безлимит абонементы)
         Route::get('unlimited-price-lists/all', [UnlimitedPriceListController::class, 'unlimitedPriceLists']);
 
@@ -101,8 +103,8 @@ Route::middleware('auth:sanctum')->group(function (){
         Route::post('limited-subscriptions/select-limited-subscriptions-by-customer', [LimitedSubscriptionController::class, 'selectLimitedSubscriptionsByCustomer']);
 
         //валидация на стороне сервера
-        //проверка данных на уникальность
 
+        //проверка данных на уникальность для клиента
         //проверка паспорта
         Route::get('customers/checking-unique-passport/{value}', [CustomerController::class, 'checkingUniquePassport']);
         //проверка номера телефона
@@ -110,6 +112,7 @@ Route::middleware('auth:sanctum')->group(function (){
         //проверка email
         Route::get('customers/checking-unique-mail/{value}', [CustomerController::class, 'checkingUniqueMail']);
 
+        //проверка данных на уникальность для тренера
         //проверка паспорта
         Route::get('coaches/checking-unique-passport/{value}', [CoachController::class, 'checkingUniquePassport']);
         //проверка номера телефона

@@ -13,13 +13,11 @@ return new class extends Migration
 
             $table->date("date_begin");//Дата
 
-            $table->time("time_begin");//Время начала
-
-            $table->unsignedInteger('coach_id');
-            $table->foreign('coach_id')->references('id')->on('coaches');
-
             $table->unsignedInteger('customer_id')->nullable();
             $table->foreign('customer_id')->references('id')->on('customers');
+
+            $table->unsignedInteger('schedule_id')->nullable();
+            $table->foreign('schedule_id')->references('id')->on('personal_schedules');
 
             $table->timestamps();
         });

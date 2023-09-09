@@ -3,6 +3,8 @@
 namespace App\Http\Helpers;
 
 use App\Models\Coach;
+use App\Models\LimitedPriceList;
+use App\Models\PersonalSchedule;
 use Illuminate\Http\Request;
 
 class Utils
@@ -12,6 +14,7 @@ class Utils
     public static int $count_customers = 100;
     public static int $count_coaches = 20;
     public static int $count_gyms = 8;
+    public static int $count_personal_schedules = 1500;
 
     //Отчества для фабрики клиенты и тренеры
     public static array $patronymic = ["Мирославов", "Константинов",
@@ -85,18 +88,50 @@ class Utils
     ];
 
     //регистрирует клинта на тренировки с тренером
-    public static function singUpPersonalWorkout(&$arr_sing_personal, $date, $faker, $customer_id): void {
+    public static function singUpPersonalWorkout(&$arr_sing_personal, $date, $faker, $customer_id, $limited_price_list_id): void {
+
+        $limited_price_list = LimitedPriceList::all()->where('id', $limited_price_list_id)->first();
+        $personal_workout = PersonalSchedule::all()->where('coach_id', $limited_price_list->coach_id)->pluck('id');
 
         // записываем клиента на 8 персональных тренировок
         for ($j = 1; $j <=8; $j++){
 
             //клиент может купить перс тренировки на месяц, поэтому генерирую дату от начало открытия абонемента + месяц
-            $arr_sing_personal[] = ['date_begin'=> Utils::randomDateBySeconds($date, 2419200),
-                'time_begin'=> str_pad(rand(9,20), 2, 0, STR_PAD_LEFT).':00', // время начала тренировки
-                'coach_id'=> $faker->numberBetween(1, Utils::$count_coaches), // тренер
-                'customer_id' =>$customer_id // клиент
+            $arr_sing_personal[] = [
+                'date_begin'=> Utils::randomDateBySeconds($date, 2419200),
+                'customer_id' =>$customer_id, // клиент
+                'schedule_id' => $faker->numberBetween(0, Utils::$count_personal_schedules)
             ];
         }
+    }
+
+    public static function getCountDaysForAdditionWorkouts($first, $now, $max_date): int {
+
+        $count = 0;
+
+        switch (true){
+
+            // первый запуск
+            case $first:
+                $count = 15;
+                break;
+
+            // если дата текущая больше даты последней тренировки
+            case ($now > $max_date):
+                $count = 14 + Utils::subtractingDates($max_date, $now);
+                break;
+
+            case ($now == $max_date):
+                $count = 14;
+                break;
+
+            // если дата текущая меньше даты последней тренировки
+            case ($now <  $max_date):
+                $count = 14 - Utils::subtractingDates($now, $max_date);
+                break;
+        }
+
+        return $count;
     }
 
 }

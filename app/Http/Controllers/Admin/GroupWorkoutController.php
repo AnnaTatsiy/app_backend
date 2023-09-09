@@ -27,27 +27,7 @@ class GroupWorkoutController extends Controller
 
         //если первый запуск (max даты нет заполняем на 2 нед)
         //вычисляем кол-во дней которые нужно добавить
-        switch (true){
-
-            // первый запуск
-            case $first:
-                    $count = 15;
-                break;
-
-            // если дата текущая больше даты последней тренировки
-            case ($now > $max_date):
-                    $count = 14 + Utils::subtractingDates($max_date, $now);
-                break;
-
-            case ($now == $max_date):
-                $count = 14;
-                break;
-
-            // если дата текущая меньше даты последней тренировки
-            case ($now <  $max_date):
-                $count = 14 - Utils::subtractingDates($now, $max_date);
-                break;
-        }
+        $count = Utils::getCountDaysForAdditionWorkouts($first, $now, $max_date);
 
         //дата за которую будем добавлять тренировки
         $date = ($first) ? $now :  date("Y-m-d", strtotime($max_date. ' +1 day'));

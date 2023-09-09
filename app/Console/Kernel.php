@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Http\Controllers\Admin\GroupWorkoutController;
+use App\Http\Controllers\Admin\SignUpPersonalWorkoutController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -17,6 +18,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function (){
             GroupWorkoutController:: preparationAdd();
+        })->timezone('Europe/Moscow')->everyMinute();//->dailyAt('15:00'); // ежедневно в 15:00
+
+        $schedule->call(function (){
+            SignUpPersonalWorkoutController:: addSignUpPersonalWorkoutsForAllCoaches();
         })->timezone('Europe/Moscow')->everyMinute();//->dailyAt('15:00'); // ежедневно в 15:00
     }
 

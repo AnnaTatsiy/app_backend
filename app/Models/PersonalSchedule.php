@@ -6,25 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SignUpPersonalWorkout extends Model
+class PersonalSchedule extends Model
 {
     use HasFactory;
 
     protected $fillable = [
 
-        'date_begin',
-        'customer_id',
-        'schedule_id'
-
+        'day_id',
+        'time_begin',
+        'coach_id',
     ];
 
     // сторона "много" отношение "1:М", отношение "принадлежит"
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
+    public function day(): BelongsTo {
+        return $this->belongsTo(Day::class);
     }
 
-    public function schedule(): BelongsTo {
-        return $this->belongsTo(PersonalSchedule::class);
+    public function coach(): BelongsTo {
+        return $this->belongsTo(Coach::class);
     }
 }

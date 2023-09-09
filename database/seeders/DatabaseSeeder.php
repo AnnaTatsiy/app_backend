@@ -7,9 +7,11 @@ use App\Models\coach;
 use App\Models\Customer;
 use App\Models\GroupWorkout;
 use App\Models\Image;
+use App\Models\PersonalSchedule;
 use App\Models\Schedule;
 use App\Models\UnlimitedPriceList;
 use App\Models\User;
+use Database\Factories\PersonalScheduleFactory;
 use Faker\Generator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -86,13 +88,17 @@ class DatabaseSeeder extends Seeder
         for ($i = 1; $i <= Utils::$count_coaches; $i++) {
             $arr_lim_price_list[] = ['coach_id' => $i, 'amount_workout' => 8, 'price' => 800 * $i];
             $arr_lim_price_list[] =  ['coach_id' => $i, 'amount_workout' => 12, 'price' => 1000 * $i];
+            $arr_time_edit_personal_schedule[] = ['date_edit' => date("Y-m-d"),'coach_id' => $i];
         }
 
         // заполнение таблицы прайс лимит абонементов (покупка тренировок у тренера)
         DB::table('limited_price_lists')->insert($arr_lim_price_list);
+        DB::table('time_edit_personal_schedules')->insert($arr_time_edit_personal_schedule);
 
         // генерация расписания
         Schedule::factory(85)->create();
+        // генерация расписания персональных тренеровок
+        PersonalSchedule::factory(Utils::$count_personal_schedules)->create();
         // заполнение таблицы групповые тренировки
         GroupWorkout::factory(4200)->create();
 
@@ -111,11 +117,14 @@ class DatabaseSeeder extends Seeder
 
             // каждый второй клиент купил персональные тренировки
             if($i % 2 != 0) {
+
+                $limited_price_list_id =  $faker->numberBetween(1, 2 * Utils::$count_coaches);
+
                 // подписываю клиента на лимит абонемент
-                $arr_lim_subscriptions[] = ['customer_id' => $i, 'limited_price_list_id' => $faker->numberBetween(1, 2 * Utils::$count_coaches), 'open' => $date];
+                $arr_lim_subscriptions[] = ['customer_id' => $i, 'limited_price_list_id' => $limited_price_list_id, 'open' => $date];
 
                 //регистрирует клинта на тренировки с тренером
-                Utils::singUpPersonalWorkout($arr_sing_personal,$date,$faker,$i);
+                Utils::singUpPersonalWorkout($arr_sing_personal,$date,$faker,$i, $limited_price_list_id);
             } else{  // если клиент не купил персональные тренировки -, то записываю на групповые
 
                 // кол-во тренировок на которые клиент будет записан
