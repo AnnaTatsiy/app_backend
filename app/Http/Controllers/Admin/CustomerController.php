@@ -101,7 +101,7 @@ class CustomerController extends Controller
     public function checkingUniquePassport($value): JsonResponse
     {
         return response()->json([
-                'result' => count(Customer::all()->where('passport', $value))
+                'result' => !count(Customer::all()->where('passport', $value))
             ]);
     }
 
@@ -109,7 +109,7 @@ class CustomerController extends Controller
     public function checkingUniqueNumber($value): JsonResponse
     {
         return response()->json([
-            'result' => count(Customer::all()->where('number', $value))
+            'result' => !count(Customer::all()->where('number', $value))
         ]);
     }
 
@@ -117,7 +117,7 @@ class CustomerController extends Controller
     public function checkingUniqueMail($value): JsonResponse
     {
         return response()->json([
-            'result' => count(Customer::all()->where('mail', $value))
+            'result' => !count(Customer::all()->where('mail', $value))
         ]);
     }
 }

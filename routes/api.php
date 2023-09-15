@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function (){
         Route::post('coaches/add', [CoachController::class, 'addCoach']);
         // редактирование тренера в бд
         Route::post('coaches/edit', [CoachController::class, 'editCoach']);
+        //сколько тренеровок нужно выставить тренеру в расписании(за неделю) и сколько он выставил
+        Route::get('coaches/required-amount-workouts/{id}', [CoachController::class, 'requiredAmountWorkouts']);
 
         // получить все записи (вывод всех клиентов)
         Route::get('customers/get-all', [CustomerController::class, 'customersAll']);

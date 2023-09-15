@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Helpers\Utils;
 use App\Mail\user\Password;
 use App\Models\Coach;
 use App\Models\Customer;
+use App\Models\LimitedPriceList;
+use App\Models\LimitedSubscription;
+use App\Models\PersonalSchedule;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -101,7 +105,7 @@ class CoachController extends Controller {
     public function checkingUniquePassport($value): JsonResponse
     {
         return response()->json([
-            'result' => count(Coach::all()->where('passport', $value))
+            'result' => !count(Coach::all()->where('passport', $value))
         ]);
     }
 
@@ -109,7 +113,7 @@ class CoachController extends Controller {
     public function checkingUniqueNumber($value): JsonResponse
     {
         return response()->json([
-            'result' => count(Coach::all()->where('number', $value))
+            'result' => !count(Coach::all()->where('number', $value))
         ]);
     }
 
@@ -117,7 +121,51 @@ class CoachController extends Controller {
     public function checkingUniqueMail($value): JsonResponse
     {
         return response()->json([
-            'result' => count(Coach::all()->where('mail', $value))
+            'result' => !count(Coach::all()->where('mail', $value))
         ]);
     }
+
+    //сколько тренеровок нужно выставить тренеру в расписании(за неделю) и сколько он выставил
+    public function requiredAmountWorkouts($id) : JsonResponse{
+        $date = Utils::decMonths(date('Y-m-d'), 1);
+
+        //находим id прайса на 12 тренеровок
+        $price_id_12 = LimitedPriceList::all()
+            ->where('coach_id', $id)
+            ->where('amount_workout', 12)->first()->id;
+
+        //находим id прайса на 8 тренеровок
+        $price_id_8 = LimitedPriceList::all()
+            ->where('coach_id', $id)
+            ->where('amount_workout', 8)->first()->id;
+
+        //Находим кол-во действующих абонементов
+        $count_12 = LimitedSubscription::all()
+            ->where('limited_price_list_id', $price_id_12)
+            ->where('open', '>', $date)
+            ->count();
+
+        //Находим кол-во действующих абонементов на 8 тренеровок
+        $count_8 = LimitedSubscription::all()
+            ->where('limited_price_list_id', $price_id_8)
+            ->where('open', '>', $date)
+            ->count();
+
+        //фактически сколько тренеровок в расписании у тренера
+        $fact = PersonalSchedule::all()
+            ->where('coach_id', $id)->count();
+
+        //сколько необходимо тренеровок в расписании у тренера
+        $required = 3*$count_12 + 2*$count_8;
+
+        //сколько рекомендовано тренеровок в расписании у тренера (5 для запаса)
+        $recommend = $required + 5;
+
+        return response()->json([
+            'fact' => $fact,
+            'required' => $required,
+            'recommend' => $recommend
+        ]);
+    }
+
 }

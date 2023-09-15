@@ -10,6 +10,7 @@ use App\Models\LimitedSubscription;
 use DateTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LimitedSubscriptionController extends Controller
 {
@@ -31,17 +32,55 @@ class LimitedSubscriptionController extends Controller
 
     //добавить подписку на групповые тренировки
     public static function addLimitedSubscription(Request $request): JsonResponse{
+        $response = [];
 
-        $limited_price_list = LimitedPriceList::all()->where('coach_id', Coach::all()->where('passport',$request->input('coach'))->first()->id)
-            ->where('amount_workout', $request->input('amount_workout'))->first();
+        $coach = Coach::all()->where('passport',$request->input('coach'))->first();
+        $customer = Customer::all()->where('passport',$request->input('customer'))->first();
+        $amount_workout = $request->input('amount_workout');
 
-        $sub = new LimitedSubscription();
-        $sub->customer_id = Customer::all()->where('passport',$request->input('customer'))->first()->id;
-        $sub->limited_price_list_id=$limited_price_list->id;
-        $sub->open = date_format(new DateTime(), 'Y-m-d' );
+        $response["status"] = "";
+        $response['answer'] = null;
+        $response["message"] = "Подписка не была добавлена";
 
-        $sub->save();
+        $response["errors"] = array(
+            'coach' => "",
+            'customer' => ""
+        );
 
-        return response()->json(LimitedSubscription::with('customer', 'limited_price_list.coach')->where('id',$sub->id)->first());
+        if($customer === null){
+            $response["errors"]['customer'] = "Нет клиента с данным номером-сериии паспорта!";
+            $response["status"] = "failed";
+        }
+
+        if ($coach === null){
+            $response["errors"]['coach'] = "Нет тренера с данным номером-сериии паспорта!";
+            $response["status"] = "failed";
+        }
+        else {
+
+            // нельзя купить абонемент у тренера, который запретил продажу
+            if ($coach->sale === 0) {
+                $response["errors"]['coach'] = "Этот тренер запретил продажу абонементов!";
+                $response["status"] = "failed";
+            }
+
+            if ($coach->sale === 1 && $response["status"] !== "failed") { // продажа разрешена
+                $limited_price_list = LimitedPriceList::all()->where('coach_id', $coach->id)
+                    ->where('amount_workout', $amount_workout)->first();
+
+                $sub = new LimitedSubscription();
+                $sub->customer_id = $customer->id;
+                $sub->limited_price_list_id = $limited_price_list->id;
+                $sub->open = date_format(new DateTime(), 'Y-m-d');
+
+                $sub->save();
+
+                $response["status"] = "success";
+                $response["message"] = "Подписка успешно оформлена!";
+                $response['answer'] = LimitedSubscription::with('customer', 'limited_price_list.coach')->where('id', $sub->id)->first();
+            }
+        }
+
+        return response()->json($response);
     }
 }

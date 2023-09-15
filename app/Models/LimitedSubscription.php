@@ -26,6 +26,6 @@ class LimitedSubscription extends Model
 
     public function limited_price_list(): BelongsTo
     {
-        return $this->belongsTo(LimitedPriceList::class);
+        return $this->belongsTo(LimitedPriceList::class, 'limited_price_list_id', 'id');
     }
 }

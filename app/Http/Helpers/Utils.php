@@ -79,6 +79,11 @@ class Utils
         return date("Y-m-d", strtotime("+".$count." month", strtotime($start_date)));
     }
 
+    //Отнять от даты месяцы
+    public static function decMonths($end_date, $count) : string {
+        return date("Y-m-d", strtotime("-".$count." month", strtotime($end_date)));
+    }
+
     // типы безлимит абонементов (добавление и изменение данных не будет)
     public static array $subscription_types = [
         ['title' => 'Простой', 'spa' => false, 'pool' => false, 'group' => false],
