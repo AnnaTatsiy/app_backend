@@ -1,66 +1,69 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Краткое описание проекта 
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Предметная область: __Фитнес-клуб__<br/> 
+Стек разработки: __MySQL + Laravel + React__ 
 
-## About Laravel
+### Описание предметной области: 
+Для клиентов Фитнес-клуб занимается 
+продажей абонементов, предоставляет групповые тренировки, бассейн, а 
+также SPA-зону. Для тренеров предоставляет спортзалы для проведения 
+тренировок. Клиентом является любой человек купивший абонемент. 
+Абонемент покупается на определенный период от 1 месяца до года. 
+Стоимость абонемента зависит от его типа и периода действия. Клиент 
+может оплатить дополнительную услугу - тренировки с персональным 
+фитнес тренером, может купить 8 или 12 персональных 
+тренировок на месяц. Каждый тренер 
+индивидуально выставляет стоимость своих тренировок и расписание. 
+Администратор занимается оформлением клиентов, продажей абонементов, составляет 
+расписание групповых тренировок, прием на работу и увольнение 
+тренеров, а также контролирует проведение групповых и индивидуальных тренировок. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Для администратора был реализован следующий функционал:  
+- Составление расписания групповых тренировок: просмотр, добавление тренировок в расписание, редактирование и удаление. 
+- Поиск групповых тренировок по выбранной записи расписания. 
+- Просмотр информации о клиентах, оформленных абонементах, купленных персональных тренировках. 
+- Оформление клиентов, изменение личных данных, генерация нового пароля для входа в личный кабинет. 
+- Поиск информации о клиенте, его абонементах и купленных тренировках по ФИО или серии-номеру паспорта. 
+- Оформление абонемента. 
+- Продажа персональных тренировок. 
+- Просмотр информации о тренерах, стоимости их персональных тренировок. 
+- Поиск информации о тренере, стоимости его услуг по ФИО или серии-номеру паспорта. 
+- По каждому тренеру доступна информация о персональных тренировках за прошедшую, текущую и следующею неделю, а также заполненность его расписания.   
+- Оформление тренеров, изменение личных данных, генерация нового пароля для входа в личный кабинет, увольнение. 
+- Просмотр информации о групповые и персональные тренировки, реализован фильтр для быстрого поиска нужных данных. 
+- Возможность отмены групповой тренировки.
+- Просмотр детальной информации о групповуй тренировки, ее статусе (активна запись или неактивна), записанные клиенты, количество участников. 
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+   
+### Для тренера был реализован следующий функционал:  
+- Просмотр своего расписания персональных тренировок. 
+- Просмотр записей на персональные тренировки за прошедшую, текущую и следующую неделю. 
+- Изменить расписание персональных тренировок (доступ открыт раз в 2 недели). 
+- Получить информацию о том сколько необходимо иметь тренировок в расписании для возможности обслужить всех своих клиентов. 
+- Закрыть доступ администратору на продажу своих тренировок. 
+- Изменять стоимость своих тренировок (упрощение модели). 
+- Просмотр расписания групповых тренировок. 
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Для клиента был реализован следующий функционал: 
+- Просмотр информации о оформленном абонементе и купленных тренировках, ближайших записях на персональные и групповые тренировки. 
+- Возможность отмены записи на групповую или персональную тренировку. 
+- Клиент может просматривать доступные персональные и групповые тренировки и делать на них записи. 
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Функционал сервера: 
+- Автоматическое заполнение данных о проходящих групповых тренировках согласно расписанию на 2 недели вперед. 
+- Автоматическое заполнение данных о проходящих персональных тренировках согласно расписанию на 2 недели вперед. 
+- Автоматическое закрытие записи на групповые тренировки, если их дата устарела или записалось максимальное количество участников.  
+- Контроль частоты изменения персонального расписания тренеров. 
+- Контроль доступа клиентов к тренировкам. 
+- Контроль записи клиентов на тренировки.  
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Дополнительный функционал: 
+- в CRUD операциях была реализована валидация на стороне клиента и на стороне сервера. 
+- загрузка аватара на сервер для клиента и тренера. 
+- была сделана авторизация пользователей и личный кабинет (почта пользователя является логином для входа, после оформления администратором, на почту пользователя приходят личные данные для проверки и пароль для входа в личный кабинет) 
+- клиенты и тренеры получают уведомления о изменении расписания, регистрациях на персональные тренировки, отмене тренировки и т. д. 
+- динамическая пагинация на страницах 
